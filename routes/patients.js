@@ -1,0 +1,5 @@
+const express=require('express'),r=express.Router(),db=require('../database/db'),store=require('./store'),v=require('./validation');
+r.get('/patient/:id',async(req,res,next)=>{let id=v.id(req.params.id);if(!id)return res.status(400).json({error:'Invalid ID'});try{if(db.available()){let rows=await db.query('SELECT id,name,preferred_name AS preferredName,age,preferred_language AS language FROM patients WHERE id=?',[id]);return rows.length?res.json(rows[0]):res.status(404).json({error:'Not found'})}res.json(store.patient)}catch(e){next(e)}});
+r.get('/settings/:patientId',async(req,res)=>{let id=v.id(req.params.patientId);if(!id)return res.status(400).json({error:'Invalid ID'});res.json(store.settings[id]||{})});
+r.put('/settings/:patientId',async(req,res)=>{let id=v.id(req.params.patientId);if(!id)return res.status(400).json({error:'Invalid ID'});let allowed=['language','theme','font','contrast','motion','autoSpeak','voiceType','speed','volume'];let update={};for(let key of allowed)if(Object.hasOwn(req.body,key))update[key]=req.body[key];store.settings[id]={...store.settings[id],...update};res.json(store.settings[id])});
+module.exports=r;

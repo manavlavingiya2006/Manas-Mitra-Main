@@ -1,0 +1,3 @@
+function relevantMemories(message,memories=[]){const terms=String(message).toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(x=>x.length>2);return memories.map(m=>({memory:m,score:terms.filter(t=>`${m.title} ${m.description} ${m.category}`.toLowerCase().includes(t)).length})).filter(x=>x.score).sort((a,b)=>b.score-a.score).slice(0,4).map(x=>x.memory)}
+function candidateFromConversation(message){const text=String(message||'').trim();if(!/\b(my favorite|i like|i enjoy|my daughter|my son|i remember)\b/i.test(text))return null;return {category:/daughter|son/i.test(text)?'FAMILY':'PREFERENCE',description:text.slice(0,400),requiresConsent:true};}
+module.exports={relevantMemories,candidateFromConversation};

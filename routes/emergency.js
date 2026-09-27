@@ -1,0 +1,4 @@
+const express=require('express'),r=express.Router(),store=require('./store'),{id,clean}=require('./validation');
+r.get('/:patientId',(req,res)=>{let patientId=id(req.params.patientId);if(!patientId)return res.status(400).json({error:'Invalid patient ID'});res.json({contacts:store.contacts[patientId]||[],note:'Calls require confirmation on the device.'})});
+r.post('/trigger',(req,res)=>{let patientId=id(req.body.patientId),contact=clean(req.body.contact,40);if(!patientId||!['caregiver','emergency'].includes(contact)||req.body.confirmed!==true)return res.status(400).json({error:'Patient ID, contact and explicit confirmation are required'});store.emergencyEvents.push({patientId,contact,at:new Date().toISOString()});res.json({status:'call_required',message:'Open your phone app to place the call. No alert was sent by the demo.'})});
+module.exports=r;

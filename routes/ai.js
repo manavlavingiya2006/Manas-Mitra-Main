@@ -1,0 +1,4 @@
+const express=require('express'),r=express.Router(),{generateResponse}=require('../services/aiService'),{capabilities:voiceCapabilities}=require('../services/speechService'),{clean}=require('./validation');
+r.post('/chat',async(req,res)=>{let message=clean(req.body.message,1000);if(!message)return res.status(400).json({error:'Message required'});try{let reply=await generateResponse(message,{...req.body.context,language:req.body.language});if(!reply)return res.status(503).json({error:'AI provider not configured. Use the interactive demo conversation.'});res.json({reply})}catch(e){console.warn('AI request failed:',e.message);if(e.status===422)return res.status(422).json({error:e.message});res.status(503).json({error:'AI service temporarily unavailable. Reminders and games still work.'})}});
+r.post('/voice',(req,res)=>res.json({mode:'browser',...voiceCapabilities(),message:'Use the browser microphone and voice playback controls.'}));
+module.exports=r;

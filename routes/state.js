@@ -1,0 +1,1 @@
+const express=require('express'),auth=require('../services/authService'),state=require('../services/stateService');const r=express.Router();r.use(auth.required);r.get('/',(req,res)=>res.json(state.read(req.account)));r.put('/',async(req,res,next)=>{try{res.json(await state.write(req.account,req.body))}catch(e){next(e)}});module.exports=r;
